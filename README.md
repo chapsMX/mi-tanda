@@ -1,112 +1,137 @@
-# MiniKit Template
+# Mi Tanda - Decentralized Rotating Savings on Base
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-onchain --mini`](), configured with:
+![Mi Tanda Logo](public/miTanda_logo.png)
 
-- [MiniKit](https://docs.base.org/builderkits/minikit/overview)
-- [OnchainKit](https://www.base.org/builders/onchainkit)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Next.js](https://nextjs.org/docs)
+## Overview
 
-## Getting Started
+Mi Tanda is a decentralized application (dApp) implementing a ROSCA (Rotating Savings and Credit Association) system, also known as "Tanda" in Latin American countries. The platform allows groups of people to create and manage collective savings pools with rotating payouts, all managed transparently on the Base blockchain.
 
-1. Install dependencies:
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
+Built as a Farcaster Frame, Mi Tanda provides a user-friendly interface for creating, joining, and managing Tandas with Base USDC as the contribution token.
+
+## Key Features
+
+- **Create Tandas**: Set up new rotating savings groups with customizable parameters
+- **Join Existing Tandas**: Participate in active saving groups created by others
+- **Transparent Cycle Management**: Clear visibility of contribution cycles and payout schedule
+- **Secure Payouts**: Smart contract-managed distribution of funds to participants
+- **Farcaster Integration**: Seamless identity management via Farcaster
+
+## Technology Stack
+
+- **Frontend**: Next.js 14 (React), TailwindCSS
+- **Blockchain**: Base L2 (Ethereum Layer 2 solution)
+- **Smart Contract Interaction**: wagmi v2, viem
+- **Identity & Authentication**: Coinbase's OnchainKit with Farcaster integration
+- **Styling**: TailwindCSS with custom UI components
+
+## Project Architecture
+
+### Frontend Architecture
+
+The project follows Next.js App Router architecture with React components and hooks:
+
+- **App Router**: Handles dynamic routes like `/tandas/[id]`
+- **React Components**: Modular UI components for different views
+- **Custom Hooks**: Abstractions for blockchain interactions
+
+### Smart Contract Integration
+
+The dApp interacts with two main contracts:
+
+1. **Tanda Manager Contract**: Deployed at `0x8bf9da65f4c8479f042156e2a9d723273774898b`
+   - Manages creation of new tandas
+   - Tracks active tandas
+   - Manages participants and their statuses
+
+2. **USDC Contract**: Standard ERC-20 token contract on Base
+   - Used for contributions and payouts
+
+### Data Flow
+
+1. **Smart Contract → Frontend**: Data is fetched using wagmi's `useContractRead` hooks
+2. **Frontend → Smart Contract**: Transactions are submitted using `Transaction` component from OnchainKit
+3. **User → Smart Contract**: User interactions (create, join, contribute, claim) trigger contract functions
+
+## Project Structure
+
+```
+mi-tanda/
+├── app/                      # Next.js App Router pages
+│   ├── components/           # Shared UI components
+│   ├── create/               # Tanda creation page
+│   ├── tandas/               # Tandas listing and details
+│   │   └── [id]/             # Individual tanda details
+├── lib/                      # Library code
+│   ├── config/               # Configuration (wagmi, etc.)
+│   ├── contracts/            # Smart contract ABIs and addresses
+│   └── hooks/                # Custom React hooks
+├── public/                   # Static assets
+│   └── styles/               # Global styles
 ```
 
-2. Verify environment variables, these will be set up by the `npx create-onchain --mini` command:
+## Key Components
 
-You can regenerate the FARCASTER Account Association environment variables by running `npx create-onchain --manifest` in your project directory.
+- **`app/create/page.tsx`**: Form for creating new tandas
+- **`app/tandas/page.tsx`**: Lists all active tandas
+- **`app/tandas/[id]/page.tsx`**: Detailed view for a specific tanda
+- **`lib/contracts/tanda.ts`**: Defines contract ABIs and addresses
+- **`lib/hooks/useTandaManager.ts`**: React hooks for interacting with the Tanda Manager contract
 
-The environment variables enable the following features:
+## Installation and Setup
 
-- Frame metadata - Sets up the Frame Embed that will be shown when you cast your frame
-- Account association - Allows users to add your frame to their account, enables notifications
-- Redis API keys - Enable Webhooks and background notifications for your application by storing users notification details
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/mi-tanda.git
+   cd mi-tanda
+   ```
 
-```bash
-# Shared/OnchainKit variables
-NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME=
-NEXT_PUBLIC_URL=
-NEXT_PUBLIC_ICON_URL=
-NEXT_PUBLIC_ONCHAINKIT_API_KEY=
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-# Frame metadata
-FARCASTER_HEADER=
-FARCASTER_PAYLOAD=
-FARCASTER_SIGNATURE=
-NEXT_PUBLIC_APP_ICON=
-NEXT_PUBLIC_APP_SUBTITLE=
-NEXT_PUBLIC_APP_DESCRIPTION=
-NEXT_PUBLIC_APP_SPLASH_IMAGE=
-NEXT_PUBLIC_SPLASH_BACKGROUND_COLOR=
-NEXT_PUBLIC_APP_PRIMARY_CATEGORY=
-NEXT_PUBLIC_APP_HERO_IMAGE=
-NEXT_PUBLIC_APP_TAGLINE=
-NEXT_PUBLIC_APP_OG_TITLE=
-NEXT_PUBLIC_APP_OG_DESCRIPTION=
-NEXT_PUBLIC_APP_OG_IMAGE=
+3. Configure environment variables (create `.env.local`):
+   ```
+   # Example environment variables (replace with actual values)
+   NEXT_PUBLIC_BASE_URL=https://your-app-url.com
+   ```
 
-# Redis config
-REDIS_URL=
-REDIS_TOKEN=
-```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-3. Start the development server:
-```bash
-npm run dev
-```
+5. Visit `http://localhost:3000` in your browser
 
-## Template Features
+## Contract Interaction
 
-### Frame Configuration
-- `.well-known/farcaster.json` endpoint configured for Frame metadata and account association
-- Frame metadata automatically added to page headers in `layout.tsx`
+All interactions with the blockchain are done through the following mechanisms:
 
-### Background Notifications
-- Redis-backed notification system using Upstash
-- Ready-to-use notification endpoints in `api/notify` and `api/webhook`
-- Notification client utilities in `lib/notification-client.ts`
+1. **Read Operations**: Using wagmi's `useContractRead` hooks
+2. **Write Operations**: Using OnchainKit's `Transaction` component which provides:
+   - Transaction status updates
+   - Error handling
+   - Chain switching support
 
-### Theming
-- Custom theme defined in `theme.css` with OnchainKit variables
-- Pixel font integration with Pixelify Sans
-- Dark/light mode support through OnchainKit
+## Network Configuration
 
-### MiniKit Provider
-The app is wrapped with `MiniKitProvider` in `providers.tsx`, configured with:
-- OnchainKit integration
-- Access to Frames context
-- Sets up Wagmi Connectors
-- Sets up Frame SDK listeners
-- Applies Safe Area Insets
+The dApp is configured to work on Base network (Chain ID: 8453). It includes:
+- Automatic network detection
+- Prompts to switch networks if not on Base
+- Error handling for network-related issues
 
-## Customization
+## Contributing
 
-To get started building your own frame, follow these steps:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-1. Remove the DemoComponents:
-   - Delete `components/DemoComponents.tsx`
-   - Remove demo-related imports from `page.tsx`
+## License
 
-2. Start building your Frame:
-   - Modify `page.tsx` to create your Frame UI
-   - Update theme variables in `theme.css`
-   - Adjust MiniKit configuration in `providers.tsx`
+[MIT License](LICENSE)
 
-3. Add your frame to your account:
-   - Cast your frame to see it in action
-   - Share your frame with others to start building your community
+## Acknowledgements
 
-## Learn More
-
-- [MiniKit Documentation](https://docs.base.org/builderkits/minikit/overview)
-- [OnchainKit Documentation](https://docs.base.org/builderkits/onchainkit/getting-started)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+- Built with [Next.js](https://nextjs.org/)
+- Smart contract interactions with [wagmi](https://wagmi.sh/)
+- Transaction management with [OnchainKit](https://onchainkit.xyz/)
+- Built for [Base](https://base.org/) network
+- Identity via [Farcaster](https://www.farcaster.xyz/)
