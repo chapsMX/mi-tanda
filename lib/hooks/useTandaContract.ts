@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useAccount, useReadContract, useWriteContract, usePublicClient } from 'wagmi'
-import { TANDA_ABI, TANDA_CONTRACT_ADDRESS, USDC_ABI } from '../contracts/tanda'
+import { TANDA_MANAGER_ABI, TANDA_MANAGER_ADDRESS, USDC_ABI } from '../contracts/tanda'
 import { CreateTandaParams, TandaData } from '../types/tanda'
 
 export function useTandaContract() {
@@ -11,15 +11,15 @@ export function useTandaContract() {
 
   // Get active Tanda IDs
   const { data: activeTandaIds, refetch: refetchActiveTandas } = useReadContract({
-    address: TANDA_CONTRACT_ADDRESS,
-    abi: TANDA_ABI,
+    address: TANDA_MANAGER_ADDRESS,
+    abi: TANDA_MANAGER_ABI,
     functionName: 'getActiveTandaIds',
   })
 
   // Get USDC address
   const { data: usdcAddress } = useReadContract({
-    address: TANDA_CONTRACT_ADDRESS,
-    abi: TANDA_ABI,
+    address: TANDA_MANAGER_ADDRESS,
+    abi: TANDA_MANAGER_ABI,
     functionName: 'getUsdcAddress',
   })
 
@@ -28,8 +28,8 @@ export function useTandaContract() {
     if (!publicClient) return null
     
     const [generalInfo, currentStatus, payoutOrderInfo] = await publicClient.readContract({
-      address: TANDA_CONTRACT_ADDRESS,
-      abi: TANDA_ABI,
+      address: TANDA_MANAGER_ADDRESS,
+      abi: TANDA_MANAGER_ABI,
       functionName: 'getTandaData',
       args: [tandaId],
     })
@@ -47,17 +47,17 @@ export function useTandaContract() {
       if (!address || !usdcAddress) return
 
       // First approve USDC spending
-      const approveTx = await writeUsdcContract({
+      await writeUsdcContract({
         address: usdcAddress,
         abi: USDC_ABI,
         functionName: 'approve',
-        args: [TANDA_CONTRACT_ADDRESS, params.contributionAmount],
+        args: [TANDA_MANAGER_ADDRESS, params.contributionAmount],
       })
 
       // Then create Tanda
       const createTx = await writeTandaContract({
-        address: TANDA_CONTRACT_ADDRESS,
-        abi: TANDA_ABI,
+        address: TANDA_MANAGER_ADDRESS,
+        abi: TANDA_MANAGER_ABI,
         functionName: 'createTanda',
         args: [
           params.contributionAmount,

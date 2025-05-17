@@ -16,8 +16,15 @@ import {
   TransactionStatusAction,
 } from "@coinbase/onchainkit/transaction";
 import { base } from 'wagmi/chains';
-import { useAccount, useChainId } from 'wagmi';
+import { useChainId } from 'wagmi';
 import { TANDA_MANAGER_ADDRESS, TANDA_MANAGER_ABI } from '@/lib/contracts/tanda';
+
+interface TandaStatus {
+  isCompleted?: boolean;
+  isActive?: boolean;
+  isOpen?: boolean;
+  payoutOrderAssigned?: boolean;
+}
 
 function Header() {
   return (
@@ -30,7 +37,7 @@ function Header() {
           height={40}
           className="rounded-full"
         />
-        <h1 className="ml-2 text-xl font-bold">MiTanda</h1>
+        <h1 className="ml-2 text-xl font-bold">Mi Tanda</h1>
       </div>
       <div className="flex items-center space-x-2">
         <Identity className="flex items-center space-x-3">
@@ -68,36 +75,24 @@ function formatDate(timestamp: bigint): string {
   return new Date(Number(timestamp) * 1000).toLocaleDateString();
 }
 
-function getTandaStatusText(status: any): string {
+function getTandaStatusText(status: TandaStatus | undefined): string {
   if (!status) return 'Unknown';
   
   if (status.isCompleted) return 'Completed';
-  if (!status.isActive) return 'Inactive';
+  if (!status.isActive) return 'Active';
   if (!status.isOpen) return 'Closed';
   if (!status.payoutOrderAssigned) return 'Open for Participants';
   
   return 'Active';
 }
 
-function getTandaStatusColor(status: any): string {
-  if (!status) return 'gray';
-  
-  if (status.isCompleted) return 'green';
-  if (!status.isActive) return 'red';
-  if (!status.isOpen) return 'orange';
-  if (!status.payoutOrderAssigned) return 'blue';
-  
-  return 'green';
-}
-
 export default function TandaDetail() {
   const params = useParams();
   const router = useRouter();
-  const { address } = useAccount();
-  const chainId = useChainId();
   const { handleTransactionSuccess, handleTransactionError } = useTransactionHandler();
   const [id, setId] = useState<bigint | null>(null);
   const [networkError, setNetworkError] = useState(false);
+  const chainId = useChainId();
   
   // Extract the id from params
   useEffect(() => {
@@ -141,6 +136,38 @@ export default function TandaDetail() {
     payoutOrderAssigned: tandaData?.[1]?.payoutOrderAssigned,
     participantListLength: tandaData?.[1]?.participantListLength
   });
+
+
+  // Access tanda data safely
+  const generalInfo = tandaData ? tandaData[0] : undefined;
+  const currentStatus = tandaData ? tandaData[1] : undefined;
+  const payoutOrderInfo = tandaData ? tandaData[2] : undefined;
+  
+  // Prepare contracts for transactions
+  const contributeContract = {
+    address: TANDA_MANAGER_ADDRESS,
+    abi: TANDA_MANAGER_ABI,
+    functionName: 'contribute',
+    args: [generalInfo?.tandaId || id]
+  };
+
+  const claimPayoutContract = {
+    address: TANDA_MANAGER_ADDRESS,
+    abi: TANDA_MANAGER_ABI,
+    functionName: 'claimPayout',
+    args: [generalInfo?.tandaId || id]
+  };
+  
+  // Determine status
+  const statusText = getTandaStatusText(currentStatus);
+
+  // Format the tanda ID for display and create Basescan URL
+  const tandaIdDisplay = generalInfo?.tandaId ? 
+    `${generalInfo.tandaId.toString()}` : 
+    id?.toString() || '';
+  
+  // Base explorer URL for smart contracts
+  const basescanUrl = `https://basescan.org/address/${generalInfo?.tandaAddress || ''}`;
 
   // Display loading state
   if (isLoading || !id) {
@@ -226,46 +253,6 @@ export default function TandaDetail() {
     );
   }
 
-  // Destructure tanda data
-  const [generalInfo, currentStatus, payoutOrderInfo] = tandaData;
-  
-  // Prepare contracts for transactions
-  const joinTandaContract = {
-    address: TANDA_MANAGER_ADDRESS,
-    abi: TANDA_MANAGER_ABI,
-    functionName: 'joinTanda',
-    args: [generalInfo?.tandaId || id]
-  };
-
-  const contributeContract = {
-    address: TANDA_MANAGER_ADDRESS,
-    abi: TANDA_MANAGER_ABI,
-    functionName: 'contribute',
-    args: [generalInfo?.tandaId || id]
-  };
-
-  const claimPayoutContract = {
-    address: TANDA_MANAGER_ADDRESS,
-    abi: TANDA_MANAGER_ABI,
-    functionName: 'claimPayout',
-    args: [generalInfo?.tandaId || id]
-  };
-
-  // Calculate if user is a participant (would need contract call in a real implementation)
-  const isUserParticipant = address && currentStatus && currentStatus.participantListLength > 0;
-  
-  // Determine status
-  const statusText = getTandaStatusText(currentStatus);
-  const statusColor = getTandaStatusColor(currentStatus);
-
-  // Format the tanda ID for display and create Basescan URL
-  const tandaIdDisplay = generalInfo?.tandaId ? 
-    `${generalInfo.tandaId.toString()}` : 
-    id?.toString() || '';
-  
-  // Base explorer URL for smart contracts
-  const basescanUrl = `https://basescan.org/address/${generalInfo?.tandaAddress || ''}`;
-
   return (
     <div className="w-full max-w-2xl mx-auto px-4 py-8">
       <Header />
@@ -325,37 +312,15 @@ export default function TandaDetail() {
 
       {/* Action Section */}
       <div className="mb-6">
-        {/* Join Tanda Button - Always show it if user is not a participant */}
-        {!isUserParticipant && (
-          <>
-            {!currentStatus?.isOpen && (
-              <div className="mb-3 p-3 bg-orange-50 border border-orange-200 rounded-md text-orange-700 text-sm">
-                This tanda is not open for new participants at this time.
-              </div>
-            )}
-            <Transaction
-              chainId={base.id}
-              contracts={[joinTandaContract]}
-              onSuccess={handleTransactionSuccess}
-              onError={handleTransactionError}
-            >
-              <div className="w-full">
-                <TransactionButton
-                  text="Join Tanda"
-                  disabled={networkError || !currentStatus?.isOpen}
-                  className="w-full bg-[#0052FF] hover:bg-[#0052FF]/90 text-white py-3 rounded-lg font-medium"
-                />
-              </div>
-              <TransactionStatus>
-                <TransactionStatusLabel />
-                <TransactionStatusAction />
-              </TransactionStatus>
-            </Transaction>
-          </>
+        {currentStatus?.isOpen && (
+          <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-md text-blue-700 text-sm">
+            This tanda is open for participants but the join function has been temporarily disabled. 
+            To join this tanda, please visit <a href="https://app.mitanda.org/" target="_blank" rel="noopener noreferrer" className="text-blue-800 font-semibold underline">app.mitanda.org</a>
+          </div>
         )}
 
         {/* Contribute Button - Show only if tanda is active and user is a participant */}
-        {currentStatus?.isActive && isUserParticipant && (
+        {currentStatus?.isActive && (
           <Transaction
             chainId={base.id}
             contracts={[contributeContract]}
@@ -377,7 +342,7 @@ export default function TandaDetail() {
         )}
 
         {/* Claim Payout Button - Show only if tanda is active and user is a participant */}
-        {currentStatus?.isActive && isUserParticipant && (
+        {currentStatus?.isActive && (
           <Transaction
             chainId={base.id}
             contracts={[claimPayoutContract]}
@@ -425,7 +390,7 @@ export default function TandaDetail() {
         <div className="p-4 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-500 mb-1">Participants</p>
           <p className="text-xl font-bold">
-            {currentStatus?.totalParticipants ? Number(currentStatus.totalParticipants) : '0'} / {generalInfo?.participantCount || '0'}
+            {currentStatus?.participantListLength ? currentStatus.participantListLength.toString() : '0'} / {generalInfo?.participantCount || '0'}
           </p>
         </div>
       </div>
@@ -494,10 +459,10 @@ export default function TandaDetail() {
       </div>
 
       {/* Participants Section */}
-      {currentStatus?.totalParticipants && Number(currentStatus.totalParticipants) > 0 ? (
+      {currentStatus?.participantListLength && Number(currentStatus.participantListLength) > 0 ? (
         <div className="mb-6 bg-white rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
           <h3 className="p-4 bg-gray-50 font-bold border-b">
-            Participants ({generalInfo?.participantCount || '0'})
+            Participants ({currentStatus.participantListLength.toString()}/{generalInfo?.participantCount || '0'})
           </h3>
           
           <div className="p-4">

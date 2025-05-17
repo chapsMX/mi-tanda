@@ -109,7 +109,7 @@ export default function App() {
               Tandas, also known as ROSCAs,are informal, 
               community-based savings mechanisms widely used across Latin America, Africa, Southeast 
               Asia, and immigrant communities worldwide. In a tanda, a group of individuals agrees 
-              to contribute a fixed amount of money at regular intervals. At each interval, or "round", 
+              to contribute a fixed amount of money at regular intervals. At each interval, or round, 
               one member receives the total pooled amount. The cycle continues until all members have 
               received a payout.
             </p>

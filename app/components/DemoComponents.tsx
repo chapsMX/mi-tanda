@@ -1,19 +1,12 @@
 "use client";
 
-import React, { type ReactNode, useCallback, useMemo } from "react";
+import React, { type ReactNode, useCallback } from "react";
 import { useAccount } from "wagmi";
 import {
-  Transaction,
-  TransactionButton,
-  TransactionToast,
-  TransactionToastAction,
-  TransactionToastIcon,
-  TransactionToastLabel,
+
   TransactionError,
   TransactionResponse,
-  TransactionStatusAction,
-  TransactionStatusLabel,
-  TransactionStatus,
+
 } from "@coinbase/onchainkit/transaction";
 import { useNotification } from "@coinbase/onchainkit/minikit";
 

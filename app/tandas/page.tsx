@@ -131,7 +131,7 @@ function TandaCard({ tandaId }: TandaCardProps) {
         </div>
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Participants:</p>
-          <p className="font-medium">{Number(currentStatus.totalParticipants)}/{generalInfo.participantCount}</p>
+          <p className="font-medium">{Number(currentStatus.participantListLength)}/{generalInfo.participantCount}</p>
         </div>
       </div>
     </div>

@@ -95,11 +95,13 @@ export default function CreateTandaPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
     
     // Validate network before proceeding
     if (chainId !== base.id) {
       setNetworkError(true);
       setError('Please switch to Base network before creating a tanda');
+      setIsSubmitting(false);
       return;
     }
 
@@ -107,12 +109,14 @@ export default function CreateTandaPage() {
     const contribution = parseFloat(formData.contributionAmount);
     if (contribution < 10) {
       setError('Contribution amount must be at least 10 USDC');
+      setIsSubmitting(false);
       return;
     }
 
     const participants = parseInt(formData.participantCount);
     if (participants < 2) {
       setError('Must have at least 2 participants');
+      setIsSubmitting(false);
       return;
     }
   };
@@ -271,8 +275,14 @@ export default function CreateTandaPage() {
               <Transaction
                 chainId={base.id}
                 contracts={[approveContract]}
-                onSuccess={handleTransactionSuccess}
-                onError={handleTransactionError}
+                onSuccess={(data) => {
+                  setIsSubmitting(false);
+                  handleTransactionSuccess(data);
+                }}
+                onError={(error) => {
+                  setIsSubmitting(false);
+                  handleTransactionError(error);
+                }}
               >
                 <div className="w-full mb-3">
                   <TransactionButton
@@ -292,10 +302,14 @@ export default function CreateTandaPage() {
               chainId={base.id}
               contracts={[createTandaContract]}
               onSuccess={(data) => {
+                setIsSubmitting(false);
                 handleTransactionSuccess(data);
                 router.push('/tandas');
               }}
-              onError={handleTransactionError}
+              onError={(error) => {
+                setIsSubmitting(false);
+                handleTransactionError(error);
+              }}
             >
               <div className="w-full">
                 <TransactionButton
