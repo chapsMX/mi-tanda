@@ -99,7 +99,14 @@ export default function TandaDetail() {
     if (params?.id && typeof params.id === 'string') {
       try {
         console.log("Extracting ID from params:", params.id);
-        const numericId = BigInt(params.id);
+        let numericId = BigInt(params.id);
+        
+        // La app externa comienza con ID 1, ajustar para compatibilidad
+        if (numericId === BigInt(0)) {
+          console.log("Adjusting tanda ID from 0 to 1 for compatibility");
+          numericId = BigInt(1);
+        }
+        
         setId(numericId);
       } catch (e) {
         console.error('Invalid ID parameter', e);
@@ -366,50 +373,50 @@ export default function TandaDetail() {
 
       {/* Summary Cards Grid */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-500 mb-1">Contribution Amount</p>
-          <p className="text-xl font-bold">
+        <div className="p-4 bg-[var(--app-card-bg)] rounded-lg border border-[var(--app-card-border)]">
+          <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Contribution Amount</p>
+          <p className="text-xl font-bold text-[var(--app-foreground)]">
             {generalInfo?.contributionAmount ? formatUnits(generalInfo.contributionAmount, 6) : '0'} USDC
           </p>
         </div>
         
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-500 mb-1">Current Cycle</p>
-          <p className="text-xl font-bold">
+        <div className="p-4 bg-[var(--app-card-bg)] rounded-lg border border-[var(--app-card-border)]">
+          <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Current Cycle</p>
+          <p className="text-xl font-bold text-[var(--app-foreground)]">
             {currentStatus?.currentCycle ? currentStatus.currentCycle.toString() : '0'} of {generalInfo?.participantCount || '0'}
           </p>
         </div>
         
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-500 mb-1">Total Funds</p>
-          <p className="text-xl font-bold">
+        <div className="p-4 bg-[var(--app-card-bg)] rounded-lg border border-[var(--app-card-border)]">
+          <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Total Funds</p>
+          <p className="text-xl font-bold text-[var(--app-foreground)]">
             {currentStatus?.totalFunds ? formatUnits(currentStatus.totalFunds, 6) : '0'} USDC
           </p>
         </div>
         
-        <div className="p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-500 mb-1">Participants</p>
-          <p className="text-xl font-bold">
+        <div className="p-4 bg-[var(--app-card-bg)] rounded-lg border border-[var(--app-card-border)]">
+          <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Participants</p>
+          <p className="text-xl font-bold text-[var(--app-foreground)]">
             {currentStatus?.participantListLength ? currentStatus.participantListLength.toString() : '0'} / {generalInfo?.participantCount || '0'}
           </p>
         </div>
       </div>
 
       {/* Cycle Information */}
-      <div className="mb-6 bg-white rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
-        <h3 className="p-4 bg-gray-50 font-bold border-b">Cycle Information</h3>
+      <div className="mb-6 bg-[var(--app-card-bg)] rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
+        <h3 className="p-4 bg-[var(--app-gray-light)] font-bold border-b border-[var(--app-card-border)] text-[var(--app-foreground)]">Cycle Information</h3>
         
         <div className="grid grid-cols-2 gap-y-4 p-4">
           <div>
-            <p className="text-sm text-gray-500 mb-1">Next Payout</p>
-            <p className="font-medium">
+            <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Next Payout</p>
+            <p className="font-medium text-[var(--app-foreground)]">
               {currentStatus?.nextPayoutTimestamp ? formatDate(currentStatus.nextPayoutTimestamp) : '--'}
             </p>
           </div>
           
           <div>
-            <p className="text-sm text-gray-500 mb-1">Current Payout Recipient</p>
-            <p className="font-medium">
+            <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Current Payout Recipient</p>
+            <p className="font-medium text-[var(--app-foreground)]">
               {payoutOrderInfo && Array.isArray(payoutOrderInfo) && payoutOrderInfo.length > 0 && payoutOrderInfo[0]
                 ? `0x${payoutOrderInfo[0].toString(16)}`.slice(0, 6) + '...' + `0x${payoutOrderInfo[0].toString(16)}`.slice(-4)
                 : '0x0000...0000'}
@@ -417,15 +424,15 @@ export default function TandaDetail() {
           </div>
           
           <div>
-            <p className="text-sm text-gray-500 mb-1">Payout Interval</p>
-            <p className="font-medium">
+            <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Payout Interval</p>
+            <p className="font-medium text-[var(--app-foreground)]">
               {generalInfo?.payoutInterval ? (Number(generalInfo.payoutInterval) / 86400).toFixed(0) : '0'} days
             </p>
           </div>
           
           <div>
-            <p className="text-sm text-gray-500 mb-1">Grace Period</p>
-            <p className="font-medium">
+            <p className="text-sm text-[var(--app-foreground-muted)] mb-1">Grace Period</p>
+            <p className="font-medium text-[var(--app-foreground)]">
               {generalInfo?.gracePeriod ? (Number(generalInfo.gracePeriod) / 86400).toFixed(0) : '0'} days
             </p>
           </div>
@@ -433,26 +440,26 @@ export default function TandaDetail() {
       </div>
 
       {/* Status Information */}
-      <div className="mb-6 bg-white rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
-        <h3 className="p-4 bg-gray-50 font-bold border-b">Tanda Status</h3>
+      <div className="mb-6 bg-[var(--app-card-bg)] rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
+        <h3 className="p-4 bg-[var(--app-gray-light)] font-bold border-b border-[var(--app-card-border)] text-[var(--app-foreground)]">Tanda Status</h3>
         
         <div className="p-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-2 ${currentStatus?.isOpen ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className="font-medium">Open for Participants: {currentStatus?.isOpen ? 'Yes' : 'No'}</span>
+              <span className="font-medium text-[var(--app-foreground)]">Open for Participants: {currentStatus?.isOpen ? 'Yes' : 'No'}</span>
             </div>
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-2 ${currentStatus?.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span className="font-medium">Active: {currentStatus?.isActive ? 'Yes' : 'No'}</span>
+              <span className="font-medium text-[var(--app-foreground)]">Active: {currentStatus?.isActive ? 'Yes' : 'No'}</span>
             </div>
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-2 ${currentStatus?.payoutOrderAssigned ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
-              <span className="font-medium">Payout Order Assigned: {currentStatus?.payoutOrderAssigned ? 'Yes' : 'No'}</span>
+              <span className="font-medium text-[var(--app-foreground)]">Payout Order Assigned: {currentStatus?.payoutOrderAssigned ? 'Yes' : 'No'}</span>
             </div>
             <div className="flex items-center">
               <div className={`w-3 h-3 rounded-full mr-2 ${currentStatus?.isCompleted ? 'bg-green-500' : 'bg-gray-500'}`}></div>
-              <span className="font-medium">Completed: {currentStatus?.isCompleted ? 'Yes' : 'No'}</span>
+              <span className="font-medium text-[var(--app-foreground)]">Completed: {currentStatus?.isCompleted ? 'Yes' : 'No'}</span>
             </div>
           </div>
         </div>
@@ -460,13 +467,13 @@ export default function TandaDetail() {
 
       {/* Participants Section */}
       {currentStatus?.participantListLength && Number(currentStatus.participantListLength) > 0 ? (
-        <div className="mb-6 bg-white rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
-          <h3 className="p-4 bg-gray-50 font-bold border-b">
+        <div className="mb-6 bg-[var(--app-card-bg)] rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
+          <h3 className="p-4 bg-[var(--app-gray-light)] font-bold border-b border-[var(--app-card-border)] text-[var(--app-foreground)]">
             Participants ({currentStatus.participantListLength.toString()}/{generalInfo?.participantCount || '0'})
           </h3>
           
           <div className="p-4">
-            <div className="grid grid-cols-4 gap-2 pb-2 border-b text-sm font-medium text-gray-500">
+            <div className="grid grid-cols-4 gap-2 pb-2 border-b text-sm font-medium text-[var(--app-foreground-muted)]">
               <div>ADDRESS</div>
               <div>STATUS</div>
               <div>PAID UNTIL</div>
@@ -474,18 +481,18 @@ export default function TandaDetail() {
             </div>
             
             {/* In a real app we would map through participants here */}
-            <div className="py-4 text-center text-gray-500">
+            <div className="py-4 text-center text-[var(--app-foreground-muted)]">
               Participant data not available
             </div>
           </div>
         </div>
       ) : (
-        <div className="mb-6 bg-white rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
-          <h3 className="p-4 bg-gray-50 font-bold border-b">
+        <div className="mb-6 bg-[var(--app-card-bg)] rounded-lg shadow-sm border border-[var(--app-card-border)] overflow-hidden">
+          <h3 className="p-4 bg-[var(--app-gray-light)] font-bold border-b border-[var(--app-card-border)] text-[var(--app-foreground)]">
             Participants (0/{generalInfo?.participantCount || '0'})
           </h3>
           
-          <div className="p-6 text-center text-gray-500">
+          <div className="p-6 text-center text-[var(--app-foreground-muted)]">
             No participants have joined this tanda yet
           </div>
         </div>

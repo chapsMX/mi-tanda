@@ -67,11 +67,11 @@ function TandaCard({ tandaId }: TandaCardProps) {
 
   if (isLoading) {
     return (
-      <div className="p-6 bg-white rounded-lg shadow-sm animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-1/4 mb-2"></div>
+      <div className="p-6 bg-[var(--app-card-bg)] rounded-lg shadow-sm animate-pulse border border-[var(--app-card-border)]">
+        <div className="h-4 bg-[var(--app-gray)] rounded w-1/4 mb-2"></div>
         <div className="space-y-3">
-          <div className="h-3 bg-gray-200 rounded"></div>
-          <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+          <div className="h-3 bg-[var(--app-gray)] rounded"></div>
+          <div className="h-3 bg-[var(--app-gray)] rounded w-5/6"></div>
         </div>
       </div>
     );
@@ -82,7 +82,7 @@ function TandaCard({ tandaId }: TandaCardProps) {
   const [generalInfo, currentStatus] = tandaData;
   
   return (
-    <div className="p-4 bg-white rounded-lg shadow-sm border border-[var(--app-card-border)]">
+    <div className="p-4 bg-[var(--app-card-bg)] rounded-lg shadow-sm border border-[var(--app-card-border)]">
       <div className="flex justify-between items-start mb-2">
         <div>
           <h3 className="text-lg font-bold text-[#0052FF]">
@@ -103,19 +103,19 @@ function TandaCard({ tandaId }: TandaCardProps) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Contribution:</p>
-          <p className="font-medium">{formatUnits(generalInfo.contributionAmount, 6)} USDC</p>
+          <p className="font-medium text-[var(--app-foreground)]">{formatUnits(generalInfo.contributionAmount, 6)} USDC</p>
         </div>
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Cycle:</p>
-          <p className="font-medium">{currentStatus.currentCycle.toString()}/{generalInfo.participantCount}</p>
+          <p className="font-medium text-[var(--app-foreground)]">{currentStatus.currentCycle.toString()}/{generalInfo.participantCount}</p>
         </div>
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Interval:</p>
-          <p className="font-medium">{(Number(generalInfo.payoutInterval) / 86400).toFixed(0)} days</p>
+          <p className="font-medium text-[var(--app-foreground)]">{(Number(generalInfo.payoutInterval) / 86400).toFixed(0)} days</p>
         </div>
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Next Payout:</p>
-          <p className="font-medium">
+          <p className="font-medium text-[var(--app-foreground)]">
             {currentStatus.nextPayoutTimestamp > BigInt(0) 
               ? new Date(Number(currentStatus.nextPayoutTimestamp) * 1000).toLocaleDateString()
               : 'Not started'}
@@ -123,15 +123,15 @@ function TandaCard({ tandaId }: TandaCardProps) {
         </div>
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Grace Period:</p>
-          <p className="font-medium">{(Number(generalInfo.gracePeriod) / 86400).toFixed(0)} days</p>
+          <p className="font-medium text-[var(--app-foreground)]">{(Number(generalInfo.gracePeriod) / 86400).toFixed(0)} days</p>
         </div>
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Total Funds:</p>
-          <p className="font-medium">{formatUnits(currentStatus.totalFunds, 6)} USDC</p>
+          <p className="font-medium text-[var(--app-foreground)]">{formatUnits(currentStatus.totalFunds, 6)} USDC</p>
         </div>
         <div>
           <p className="text-sm font-bold text-[#0052FF]">Participants:</p>
-          <p className="font-medium">{Number(currentStatus.participantListLength)}/{generalInfo.participantCount}</p>
+          <p className="font-medium text-[var(--app-foreground)]">{Number(currentStatus.participantListLength)}/{generalInfo.participantCount}</p>
         </div>
       </div>
     </div>
@@ -168,11 +168,11 @@ export default function TandasPage() {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="p-6 bg-white rounded-lg shadow-sm animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+          <div key={i} className="p-6 bg-[var(--app-card-bg)] rounded-lg shadow-sm animate-pulse border border-[var(--app-card-border)]">
+            <div className="h-4 bg-[var(--app-gray)] rounded w-1/4 mb-4"></div>
             <div className="space-y-3">
-              <div className="h-3 bg-gray-200 rounded"></div>
-              <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+              <div className="h-3 bg-[var(--app-gray)] rounded"></div>
+              <div className="h-3 bg-[var(--app-gray)] rounded w-5/6"></div>
             </div>
           </div>
         ))}

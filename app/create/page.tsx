@@ -176,7 +176,7 @@ export default function CreateTandaPage() {
         <h1 className="text-3xl font-bold text-[#0052FF]">Create New Tanda</h1>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-[var(--app-card-border)] p-6">
+      <div className="bg-[var(--app-card-bg)] rounded-lg shadow-sm border border-[var(--app-card-border)] p-6">
         {networkError && (
           <div className="p-4 mb-4 bg-yellow-50 border border-yellow-300 rounded-md">
             <h3 className="font-bold text-yellow-800">Wrong Network Detected</h3>
@@ -209,7 +209,7 @@ export default function CreateTandaPage() {
               step="1"
               value={formData.contributionAmount}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent"
+              className="w-full px-3 py-2 border border-[var(--app-card-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-[var(--app-card-bg)] text-[var(--app-foreground)]"
               placeholder="Minimum 10 USDC"
               required
               disabled={isSubmitting}
@@ -227,7 +227,7 @@ export default function CreateTandaPage() {
               step="1"
               value={formData.payoutInterval}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent"
+              className="w-full px-3 py-2 border border-[var(--app-card-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-[var(--app-card-bg)] text-[var(--app-foreground)]"
               placeholder="Enter days between payouts"
               required
               disabled={isSubmitting}
@@ -245,7 +245,7 @@ export default function CreateTandaPage() {
               step="1"
               value={formData.gracePeriod}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent"
+              className="w-full px-3 py-2 border border-[var(--app-card-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-[var(--app-card-bg)] text-[var(--app-foreground)]"
               placeholder="Enter grace period in days"
               required
               disabled={isSubmitting}
@@ -263,7 +263,7 @@ export default function CreateTandaPage() {
               step="1"
               value={formData.participantCount}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent"
+              className="w-full px-3 py-2 border border-[var(--app-card-border)] rounded-md focus:outline-none focus:ring-2 focus:ring-[#0052FF] focus:border-transparent bg-[var(--app-card-bg)] text-[var(--app-foreground)]"
               placeholder="Minimum 2 participants"
               required
               disabled={isSubmitting}
